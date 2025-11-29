@@ -1,8 +1,19 @@
 import React from "react";
 import { NavLink, Link } from "react-router";
 import Logo from "../../../components/Logo/Logo";
+import useAuth from "../../../hooks/useAuth";
 
 const NavBar = () => {
+  const { user, signOutUser } = useAuth();
+
+  const handleLogOut = () => {
+    signOutUser()
+      .then()
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   const navItems = [
     { label: "Services", to: "/services" },
     { label: "About Us", to: "/about" },
@@ -54,9 +65,9 @@ const NavBar = () => {
         </div>
 
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 btn btn-ghost text-xl">
+        <div to="/" className="flex items-center gap-2 btn btn-ghost text-xl">
           <Logo />
-        </Link>
+        </div>
       </div>
 
       {/* Desktop Menu */}
@@ -65,9 +76,21 @@ const NavBar = () => {
       </div>
 
       {/* Right Section */}
-      <div className="navbar-end">
-        <Link to="/contact" className="btn btn-primary rounded-full px-6">
-          Contact
+      <div className="navbar-end space-x-2">
+        {user ? (
+          <a
+            onClick={handleLogOut}
+            className="btn btn-primary rounded-full px-6"
+          >
+            Logout
+          </a>
+        ) : (
+          <Link to="/login" className="btn btn-primary rounded-full px-6">
+            Login
+          </Link>
+        )}
+        <Link to="/rider" className="btn btn-primary rounded-full px-6">
+          Be a Rider
         </Link>
       </div>
     </nav>
