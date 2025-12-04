@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
+import { useLoaderData } from "react-router";
 
 const SendParcel = () => {
   const [parcelType, setParcelType] = useState("document");
@@ -7,8 +8,38 @@ const SendParcel = () => {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm();
+
+  const serviceCenters = useLoaderData();
+  const regionduplicate = serviceCenters.map((c) => c.region);
+  const regions = [...new Set(regionduplicate)]; // only took unique one
+  // console.log(regions);
+
+  // Sender Region wise District show
+  const senderRegion = useWatch({ control, name: "senderRegion" });
+  const senderDistricts = senderRegion
+    ? [
+        ...new Set(
+          serviceCenters
+            .filter((c) => c.region === senderRegion)
+            .map((c) => c.district)
+        ),
+      ].sort()
+    : [];
+
+  // Receiver Region wise District show
+  const receiverRegion = useWatch({ control, name: "receiverRegion" });
+  const receiverDistricts = receiverRegion
+    ? [
+        ...new Set(
+          serviceCenters
+            .filter((c) => c.region === receiverRegion)
+            .map((c) => c.district)
+        ),
+      ].sort()
+    : [];
 
   const onSubmit = (data) => {
     console.log("FORM SUBMITTED:", data);
@@ -70,8 +101,10 @@ const SendParcel = () => {
           <InputField
             label="Parcel Weight (KG)"
             placeholder="Parcel Weight (KG)"
+            type="number"
             register={register("parcelWeight", {
               required: "Parcel weight required",
+              min: { value: 0.1, message: "Weight must be greater than 0" },
             })}
             error={errors.parcelWeight}
           />
@@ -112,11 +145,23 @@ const SendParcel = () => {
               />
 
               <SelectField
+                label="Your Region "
+                register={register("senderRegion", {
+                  required: "Region required",
+                })}
+                value={regions}
+                error={errors.senderRegion}
+                placeholder="Pick a region"
+              />
+
+              <SelectField
                 label="Your District"
                 register={register("senderDistrict", {
                   required: "District required",
                 })}
+                value={senderDistricts}
                 error={errors.senderDistrict}
+                placeholder="Pick a district"
               />
 
               <TextareaField
@@ -163,11 +208,23 @@ const SendParcel = () => {
               />
 
               <SelectField
+                label="Receiver Region"
+                register={register("receiverRegion", {
+                  required: "Region required",
+                })}
+                value={regions}
+                error={errors.receiverRegion}
+                placeholder="Pick a region"
+              />
+
+              <SelectField
                 label="Receiver District"
                 register={register("receiverDistrict", {
                   required: "District required",
                 })}
+                value={receiverDistricts}
                 error={errors.receiverDistrict}
+                placeholder="Pick a district"
               />
 
               <TextareaField
@@ -198,11 +255,12 @@ export default SendParcel;
 
 /* ---------------------- Reusable Components ---------------------- */
 
-function InputField({ label, placeholder, register, error }) {
+function InputField({ label, placeholder, register, error, type = "text" }) {
   return (
     <div>
       <label className="text-sm text-gray-600">{label}</label>
       <input
+        type={type}
         placeholder={placeholder}
         {...register}
         className={`w-full mt-1 border rounded-md px-3 py-2 outline-none 
@@ -218,7 +276,13 @@ function InputField({ label, placeholder, register, error }) {
   );
 }
 
-function SelectField({ label, register, error }) {
+function SelectField({
+  label = "",
+  register = () => {},
+  error = null,
+  value = [],
+  placeholder,
+}) {
   return (
     <div>
       <label className="text-sm text-gray-600">{label}</label>
@@ -232,10 +296,14 @@ function SelectField({ label, register, error }) {
         }
         focus:ring-2`}
       >
-        <option value="">Select your District</option>
-        <option value="District 1">District 1</option>
-        <option value="District 2">District 2</option>
-        <option value="District 3">District 3</option>
+        <option value="" disabled selected>
+          {placeholder}
+        </option>
+        {value.map((r, i) => (
+          <option key={i} value={r}>
+            {r}
+          </option>
+        ))}
       </select>
       {error && <p className="text-red-500 text-xs mt-1">{error.message}</p>}
     </div>
