@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { useLoaderData } from "react-router";
+import Swal from "sweetalert2";
 
 const SendParcel = () => {
   const [parcelType, setParcelType] = useState("document");
@@ -42,8 +43,47 @@ const SendParcel = () => {
     : [];
 
   const onSubmit = (data) => {
-    console.log("FORM SUBMITTED:", data);
-    alert("Booking Submitted!");
+    // console.log(data);
+
+    const isDocument = data.parcelType === "document";
+    const isSameDistrict = data.senderDistrict === data.receiverDistrict;
+    const parcelWeight = parseFloat(data.parcelWeight) || 0;
+
+    let cost = 0;
+
+    if (isDocument) {
+      cost = isSameDistrict ? 60 : 80;
+    } else {
+      const base = isSameDistrict ? 110 : 150;
+      if (parcelWeight <= 3) {
+        cost = base;
+      } else {
+        const extraWeight = parcelWeight - 3;
+        const extraCharge = extraWeight * 40; // 40 per kg extra
+        cost = base + extraCharge;
+      }
+    }
+
+    console.log(cost);
+
+    Swal.fire({
+      title: "Agree with the Cost?",
+      text: `You will be charged ${cost} taka!`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "I agree!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        //
+        // Swal.fire({
+        //     title: "Deleted!",
+        //     text: "Your file has been deleted.",
+        //     icon: "success"
+        // });
+      }
+    });
   };
 
   return (
