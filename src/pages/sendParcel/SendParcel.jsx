@@ -2,16 +2,25 @@ import React, { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { useLoaderData } from "react-router";
 import Swal from "sweetalert2";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
+import useAuth from "../../hooks/useAuth";
 
 const SendParcel = () => {
   const [parcelType, setParcelType] = useState("document");
+  const axiosSecure = useAxiosSecure();
+  const { user } = useAuth();
 
   const {
     register,
     handleSubmit,
     control,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      senderName: user?.displayName || "",
+      senderEmail: user?.email || "",
+    },
+  });
 
   const serviceCenters = useLoaderData();
   const regionduplicate = serviceCenters.map((c) => c.region);
@@ -76,12 +85,10 @@ const SendParcel = () => {
       confirmButtonText: "I agree!",
     }).then((result) => {
       if (result.isConfirmed) {
-        //
-        // Swal.fire({
-        //     title: "Deleted!",
-        //     text: "Your file has been deleted.",
-        //     icon: "success"
-        // });
+        // save the parcel info to the database
+        axiosSecure.post("/parcels", data).then((res) => {
+          console.log("after saving parcel", res.data);
+        });
       }
     });
   };
@@ -336,9 +343,10 @@ function SelectField({
         }
         focus:ring-2`}
       >
-        <option value="" disabled selected>
+        <option value="" disabled>
           {placeholder}
         </option>
+
         {value.map((r, i) => (
           <option key={i} value={r}>
             {r}
