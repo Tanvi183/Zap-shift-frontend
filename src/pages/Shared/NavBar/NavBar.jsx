@@ -21,21 +21,39 @@ const NavBar = () => {
     { label: "Coverage", to: "/coverage" },
   ];
 
-  const renderLinks = () =>
-    navItems.map((item) => (
-      <li key={item.to}>
-        <NavLink
-          to={item.to}
-          className={({ isActive }) =>
-            isActive
-              ? "bg-primary rounded-4xl px-5 py-2.5 font-semibold"
-              : "text-base"
-          }
-        >
-          {item.label}
-        </NavLink>
-      </li>
-    ));
+  const renderLinks = () => (
+    <>
+      {navItems.map((item) => (
+        <li key={item.to}>
+          <NavLink
+            to={item.to}
+            className={({ isActive }) =>
+              isActive
+                ? "bg-primary rounded-4xl px-5 py-2.5 font-semibold"
+                : "text-base"
+            }
+          >
+            {item.label}
+          </NavLink>
+        </li>
+      ))}
+
+      {user && (
+        <li>
+          <NavLink
+            to="/dashboard/my-parcels"
+            className={({ isActive }) =>
+              isActive
+                ? "bg-primary rounded-4xl px-5 py-2.5 font-semibold"
+                : "text-base"
+            }
+          >
+            My Parcels
+          </NavLink>
+        </li>
+      )}
+    </>
+  );
 
   return (
     <div className="py-6">

@@ -8,15 +8,17 @@ import Register from "../pages/Auth/Register/Register";
 import PrivateRoute from "./PrivateRoute";
 import Rider from "../pages/Rider/Rider";
 import SendParcel from "../pages/sendParcel/SendParcel";
+import DashboardLayout from "../layouts/DashboardLayout";
+import MyParcels from "../pages/Dashboard/MyParcels/MyParcels";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    Component: RootLayout,
+    element: <RootLayout />,
     children: [
       {
         index: true,
-        Component: Home,
+        element: <Home />,
       },
 
       {
@@ -40,23 +42,37 @@ const router = createBrowserRouter([
 
       {
         path: "coverage",
-        Component: Coverage,
+        element: <Coverage />,
         loader: () => fetch("/serviceCenters.json").then((res) => res.json()),
       },
     ],
   },
   {
     path: "/",
-    Component: AuthLayout,
+    element: <AuthLayout />,
     children: [
       {
         path: "login",
-        Component: Login,
+        element: <Login />,
       },
 
       {
         path: "register",
-        Component: Register,
+        element: <Register />,
+      },
+    ],
+  },
+  {
+    path: "/dashboard",
+    element: (
+      <PrivateRoute>
+        <DashboardLayout></DashboardLayout>
+      </PrivateRoute>
+    ),
+    children: [
+      {
+        path: "my-parcels",
+        element: <MyParcels />,
       },
     ],
   },
