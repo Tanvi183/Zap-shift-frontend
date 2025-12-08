@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
-import { useLoaderData } from "react-router";
+import { useLoaderData, useNavigate } from "react-router";
 import Swal from "sweetalert2";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 import useAuth from "../../hooks/useAuth";
@@ -9,6 +9,7 @@ const SendParcel = () => {
   const [parcelType, setParcelType] = useState("document");
   const axiosSecure = useAxiosSecure();
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const {
     register,
@@ -83,20 +84,23 @@ const SendParcel = () => {
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "I agree!",
+      confirmButtonText: "Confirm and Continue Payment!",
     }).then((result) => {
       if (result.isConfirmed) {
         // save the parcel info to database
         axiosSecure.post("/parcels", data).then((res) => {
           console.log("after saving parcel", res.data);
 
-          // Success message here
-          Swal.fire({
-            title: "Parcel Submitted!",
-            text: "Your parcel information was successfully submitted.",
-            icon: "success",
-            confirmButtonColor: "#3085d6",
-          });
+          if (res.data.insertedId) {
+            navigate("/dashboard/my-parcels");
+            // Success message here
+            Swal.fire({
+              title: "Parcel Submitted!",
+              text: "Your parcel information was successfully submitted.",
+              icon: "success",
+              confirmButtonColor: "#3085d6",
+            });
+          }
         });
       }
     });
