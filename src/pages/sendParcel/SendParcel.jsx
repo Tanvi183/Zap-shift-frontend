@@ -73,7 +73,8 @@ const SendParcel = () => {
       }
     }
 
-    console.log(cost);
+    // console.log(cost);
+    data.cost = cost;
 
     Swal.fire({
       title: "Agree with the Cost?",
@@ -85,9 +86,17 @@ const SendParcel = () => {
       confirmButtonText: "I agree!",
     }).then((result) => {
       if (result.isConfirmed) {
-        // save the parcel info to the database
+        // save the parcel info to database
         axiosSecure.post("/parcels", data).then((res) => {
           console.log("after saving parcel", res.data);
+
+          // Success message here
+          Swal.fire({
+            title: "Parcel Submitted!",
+            text: "Your parcel information was successfully submitted.",
+            icon: "success",
+            confirmButtonColor: "#3085d6",
+          });
         });
       }
     });
