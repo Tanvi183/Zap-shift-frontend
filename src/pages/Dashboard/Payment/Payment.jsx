@@ -27,7 +27,7 @@ const Payment = () => {
 
     console.log(res.data);
 
-    window.location.href = res.data.url;
+    window.location.assign(res.data.url);
   };
 
   if (isLoading) {
