@@ -5,6 +5,8 @@ import useAuth from "../../../hooks/useAuth";
 import { Link, useLocation, useNavigate } from "react-router";
 import SocialLogin from "../SocialLogin/SocialLogin";
 import axios from "axios";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
+import Swal from "sweetalert2";
 
 const Register = () => {
   const {
@@ -18,6 +20,7 @@ const Register = () => {
 
   const location = useLocation();
   const navigate = useNavigate();
+  const axiosSecure = useAxiosSecure();
 
   // Watch password match
   const password = watch("password", "");
@@ -95,6 +98,24 @@ const Register = () => {
       const photoURL = imgRes.data.data.url;
       console.log("Uploaded image URL:", photoURL);
 
+      // create user in the database
+      const userInfo = {
+        email: data.email,
+        displayName: data.name,
+        photoURL: photoURL,
+      };
+      const dbRes = await axiosSecure.post("/users", userInfo);
+
+      if (dbRes.data.insertedId) {
+        // Show SweetAlert success message
+        await Swal.fire({
+          title: "Registration Successful!",
+          text: "Your account has been created.",
+          icon: "success",
+          confirmButtonText: "Go to Login",
+        });
+      }
+
       // 3. Update Firebase profile
       const userProfile = {
         displayName: data.name,
@@ -102,12 +123,20 @@ const Register = () => {
       };
 
       await updateUserProfile(userProfile);
-      console.log("Profile updated");
+      // console.log("Profile updated");
 
-      // 4. Navigate AFTER everything is done
-      navigate(location.state || "/");
+      // Navigate to login page after alert
+      navigate("/login");
+
+      // Navigate AFTER everything is done
+      navigate(location.state || "/login");
     } catch (error) {
-      console.log("Registration error:", error);
+      Swal.fire({
+        title: "Registration Failed",
+        text: error.message || "Something went wrong!",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     }
   };
 
