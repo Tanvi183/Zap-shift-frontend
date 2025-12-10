@@ -81,7 +81,8 @@ const ApproveRiders = () => {
               <th>Name</th>
               <th>Email</th>
               <th>District</th>
-              <th>Status</th>
+              <th>Application Status</th>
+              <th>Work Status</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -103,6 +104,7 @@ const ApproveRiders = () => {
                 >
                   {rider.status}
                 </td>
+                <td>{rider.workStatus}</td>
                 <td className="flex gap-2">
                   <button
                     onClick={() => updateRiderStatus(rider._id, "approved")}
