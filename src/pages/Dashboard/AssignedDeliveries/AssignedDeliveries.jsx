@@ -18,8 +18,15 @@ const AssignedDeliveries = () => {
     },
   });
 
-  const handleAcceptDelivery = (parcel) => {
-    const statusInfo = { deliveryStatus: "rider_arriving" };
+  const handleDeliveryStatusUpdate = (parcel, status) => {
+    const statusInfo = {
+      deliveryStatus: status,
+      riderId: parcel.riderId,
+    };
+    let message = `Parcel Status is updated with ${status
+      .split("_")
+      .join(" ")}`;
+
     axiosSecure
       .patch(`/parcels/${parcel._id}/status`, statusInfo)
       .then((res) => {
@@ -28,7 +35,7 @@ const AssignedDeliveries = () => {
           Swal.fire({
             position: "top-end",
             icon: "success",
-            title: `Thank you for accepting.`,
+            ttitle: message,
             showConfirmButton: false,
             timer: 1500,
           });
@@ -57,22 +64,52 @@ const AssignedDeliveries = () => {
               <tr>
                 <th>{i + 1}</th>
                 <td>{parcel.parcelName}</td>
-                {parcel.deliveryStatus === "driver_assigned" ? (
-                  <>
+                <td>
+                  {parcel.deliveryStatus === "driver_assigned" ? (
+                    <>
+                      <button
+                        onClick={() =>
+                          handleDeliveryStatusUpdate(parcel, "rider_arriving")
+                        }
+                        className="btn btn-primary text-black"
+                      >
+                        Accept
+                      </button>
+                      <button className="btn btn-warning text-black ms-2">
+                        Reject
+                      </button>
+                    </>
+                  ) : (
+                    <span>Accepted</span>
+                  )}
+                </td>
+
+                <td>
+                  {/* Show Picked Up button ONLY when parcel is NOT yet picked up */}
+                  {parcel.deliveryStatus !== "parcel_picked_up" &&
+                    parcel.deliveryStatus !== "parcel_delivered" && (
+                      <button
+                        onClick={() =>
+                          handleDeliveryStatusUpdate(parcel, "parcel_picked_up")
+                        }
+                        className="btn btn-primary text-black"
+                      >
+                        Mark as Picked Up
+                      </button>
+                    )}
+
+                  {/* Show Delivered button ONLY after parcel is picked up */}
+                  {parcel.deliveryStatus === "parcel_picked_up" && (
                     <button
-                      onClick={() => handleAcceptDelivery(parcel)}
-                      className="btn btn-primary text-black"
+                      onClick={() =>
+                        handleDeliveryStatusUpdate(parcel, "parcel_delivered")
+                      }
+                      className="btn btn-success text-black mx-2"
                     >
-                      Accept
+                      Mark as Delivered
                     </button>
-                    <button className="btn btn-warning text-black ms-2">
-                      Reject
-                    </button>
-                  </>
-                ) : (
-                  <span>Accepted</span>
-                )}
-                <td>Blue</td>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>
