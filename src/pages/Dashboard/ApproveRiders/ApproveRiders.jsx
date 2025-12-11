@@ -20,9 +20,12 @@ const ApproveRiders = () => {
   });
 
   // Update status function
-  const updateRiderStatus = async (riderId, status) => {
+  const updateRiderStatus = async (riderId, status, email) => {
     try {
-      const res = await axiosSecure.patch(`/riders/${riderId}`, { status });
+      const res = await axiosSecure.patch(`/riders/${riderId}`, {
+        status,
+        email,
+      });
       if (res.data.modifiedCount) {
         queryClient.invalidateQueries(["riders", "pending"]);
         Swal.fire({
@@ -107,7 +110,9 @@ const ApproveRiders = () => {
                 <td>{rider.workStatus}</td>
                 <td className="flex gap-2">
                   <button
-                    onClick={() => updateRiderStatus(rider._id, "approved")}
+                    onClick={() =>
+                      updateRiderStatus(rider._id, "approved", rider.email)
+                    }
                     className="btn btn-success btn-sm"
                     disabled={rider.status === "approved"}
                     title="Approve Rider"
