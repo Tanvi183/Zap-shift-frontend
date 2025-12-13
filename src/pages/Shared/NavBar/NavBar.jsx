@@ -39,18 +39,23 @@ const NavBar = () => {
       ))}
 
       {user && (
-        <li>
-          <NavLink
-            to="/dashboard/my-parcels"
-            className={({ isActive }) =>
-              isActive
-                ? "bg-primary rounded-4xl px-5 py-2.5 font-semibold"
-                : "text-base"
-            }
-          >
-            My Parcels
-          </NavLink>
-        </li>
+        <>
+          <li>
+            <NavLink
+              to="/dashboard/my-parcels"
+              className={({ isActive }) =>
+                isActive
+                  ? "bg-primary rounded-4xl px-5 py-2.5 font-semibold"
+                  : "text-base"
+              }
+            >
+              My Parcels
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/dashboard">Dashboard</NavLink>
+          </li>
+        </>
       )}
     </>
   );
